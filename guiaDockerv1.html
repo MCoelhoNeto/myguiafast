@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial Completo de Docker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 3em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #7f8c8d;
+        }
+
+        .docker-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: #2496ed;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            color: white;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .section h3 {
+            color: #34495e;
+            font-size: 1.4em;
+            margin: 25px 0 15px 0;
+            padding: 10px;
+            background: linear-gradient(45deg, #ecf0f1, #bdc3c7);
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+
+        .command-group {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .command {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 8px 0;
+            border: 1px solid #34495e;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .command:before {
+            content: "$";
+            color: #e74c3c;
+            margin-right: 8px;
+            font-weight: bold;
+        }
+
+        .description {
+            background: #e8f6f3;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 8px 0;
+            border-left: 3px solid #27ae60;
+            font-style: italic;
+        }
+
+        .example {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .example h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .warning {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #dc3545;
+            margin: 15px 0;
+        }
+
+        .tip {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #17a2b8;
+            margin: 15px 0;
+        }
+
+        .nav {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .nav a {
+            color: #3498db;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .nav a:hover {
+            color: #e74c3c;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .toc li {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        .toc a {
+            color: #2c3e50;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .toc a:hover {
+            color: #3498db;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="docker-logo">🐳</div>
+            <h1>Tutorial Completo de Docker</h1>
+            <p>Guia prático com todos os comandos essenciais para dominar o Docker</p>
+        </div>
+
+        <div class="nav">
+            <a href="#instalacao">Instalação</a>
+            <a href="#basicos">Conceitos Básicos</a>
+            <a href="#imagens">Imagens</a>
+            <a href="#containers">Containers</a>
+            <a href="#volumes">Volumes</a>
+            <a href="#redes">Redes</a>
+            <a href="#compose">Docker Compose</a>
+        </div>
+
+        <div class="section">
+            <h2>📋 Índice</h2>
+            <div class="toc">
+                <ul>
+                    <li><a href="#introducao">1. Introdução ao Docker</a></li>
+                    <li><a href="#instalacao">2. Instalação</a></li>
+                    <li><a href="#basicos">3. Conceitos Básicos</a></li>
+                    <li><a href="#imagens">4. Comandos de Imagens</a></li>
+                    <li><a href="#containers">5. Comandos de Containers</a></li>
+                    <li><a href="#volumes">6. Gerenciamento de Volumes</a></li>
+                    <li><a href="#redes">7. Gerenciamento de Redes</a></li>
+                    <li><a href="#compose">8. Docker Compose</a></li>
+                    <li><a href="#avancados">9. Comandos Avançados</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section" id="introducao">
+            <h2>🐳 Introdução ao Docker</h2>
+            <p>Docker é uma plataforma de virtualização de contêineres que permite empacotar aplicações e suas dependências em contêineres leves e portáveis. Isso garante que a aplicação funcione consistentemente em qualquer ambiente.</p>
+            
+            <h3>Principais Benefícios:</h3>
+            <ul>
+                <li><strong>Portabilidade:</strong> Execute anywhere, from development to production</li>
+                <li><strong>Eficiência:</strong> Menor overhead comparado a VMs tradicionais</li>
+                <li><strong>Escalabilidade:</strong> Fácil dimensionamento horizontal</li>
+                <li><strong>Isolamento:</strong> Aplicações isoladas umas das outras</li>
+            </ul>
+        </div>
+
+        <div class="section" id="instalacao">
+            <h2>⚙️ Instalação</h2>
+            
+            <h3>Ubuntu/Debian</h3>
+            <div class="command-group">
+                <div class="command">curl -fsSL https://get.docker.com -o get-docker.sh</div>
+                <div class="command">sudo sh get-docker.sh</div>
+                <div class="command">sudo usermod -aG docker $USER</div>
+                <div class="description">Adiciona o usuário atual ao grupo docker</div>
+            </div>
+
+            <h3>Windows</h3>
+            <div class="command-group">
+                <div class="description">Baixe o Docker Desktop do site oficial: https://www.docker.com/products/docker-desktop</div>
+            </div>
+
+            <h3>Verificar Instalação</h3>
+            <div class="command-group">
+                <div class="command">docker --version</div>
+                <div class="description">Verifica a versão instalada</div>
+                <div class="command">docker run hello-world</div>
+                <div class="description">Testa se a instalação está funcionando</div>
+            </div>
+        </div>
+
+        <div class="section" id="basicos">
+            <h2>📚 Conceitos Básicos</h2>
+            
+            <h3>Comandos de Sistema</h3>
+            <div class="command-group">
+                <div class="command">docker version</div>
+                <div class="description">Mostra informações detalhadas da versão</div>
+                
+                <div class="command">docker info</div>
+                <div class="description">Exibe informações do sistema Docker</div>
+                
+                <div class="command">docker system df</div>
+                <div class="description">Mostra uso de espaço em disco</div>
+                
+                <div class="command">docker system prune</div>
+                <div class="description">Remove recursos não utilizados</div>
+                
+                <div class="command">docker system prune -a</div>
+                <div class="description">Remove todos os recursos não utilizados (mais agressivo)</div>
+            </div>
+
+            <div class="tip">
+                <strong>💡 Dica:</strong> Use <code>docker system prune</code> regularmente para manter seu sistema limpo e liberar espaço em disco.
+            </div>
+        </div>
+
+        <div class="section" id="imagens">
+            <h2>🖼️ Comandos de Imagens</h2>
+            
+            <h3>Buscar e Baixar Imagens</h3>
+            <div class="command-group">
+                <div class="command">docker search nginx</div>
+                <div class="description">Busca imagens no Docker Hub</div>
+                
+                <div class="command">docker pull nginx</div>
+                <div class="description">Baixa a imagem mais recente</div>
+                
+                <div class="command">docker pull nginx:1.21</div>
+                <div class="description">Baixa uma versão específica</div>
+                
+                <div class="command">docker pull ubuntu:20.04</div>
+                <div class="description">Baixa Ubuntu versão 20.04</div>
+            </div>
+
+            <h3>Gerenciar Imagens</h3>
+            <div class="command-group">
+                <div class="command">docker images</div>
+                <div class="description">Lista todas as imagens locais</div>
+                
+                <div class="command">docker images -a</div>
+                <div class="description">Lista todas as imagens (incluindo intermediárias)</div>
+                
+                <div class="command">docker rmi nginx</div>
+                <div class="description">Remove uma imagem</div>
+                
+                <div class="command">docker rmi $(docker images -q)</div>
+                <div class="description">Remove todas as imagens</div>
+                
+                <div class="command">docker image inspect nginx</div>
+                <div class="description">Exibe informações detalhadas da imagem</div>
+                
+                <div class="command">docker history nginx</div>
+                <div class="description">Mostra o histórico de camadas da imagem</div>
+            </div>
+
+            <h3>Construir Imagens</h3>
+            <div class="command-group">
+                <div class="command">docker build -t minha-app .</div>
+                <div class="description">Constrói imagem a partir do Dockerfile no diretório atual</div>
+                
+                <div class="command">docker build -t minha-app:v1.0 .</div>
+                <div class="description">Constrói com tag específica</div>
+                
+                <div class="command">docker build --no-cache -t minha-app .</div>
+                <div class="description">Constrói sem usar cache</div>
+                
+                <div class="command">docker tag minha-app usuario/minha-app:latest</div>
+                <div class="description">Cria uma nova tag para a imagem</div>
+            </div>
+
+            <div class="example">
+                <h4>📝 Exemplo de Dockerfile básico:</h4>
+                <pre style="background:#2c3e50; color:#ecf0f1; padding:15px; border-radius:5px; overflow-x:auto;">
+FROM node:16-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD ["npm", "start"]</pre>
+            </div>
+        </div>
+
+        <div class="section" id="containers">
+            <h2>📦 Comandos de Containers</h2>
+            
+            <h3>Executar Containers</h3>
+            <div class="command-group">
+                <div class="command">docker run nginx</div>
+                <div class="description">Executa um container em foreground</div>
+                
+                <div class="command">docker run -d nginx</div>
+                <div class="description">Executa em background (detached)</div>
+                
+                <div class="command">docker run -d -p 8080:80 nginx</div>
+                <div class="description">Mapeia porta 8080 do host para porta 80 do container</div>
+                
+                <div class="command">docker run -d --name meu-nginx nginx</div>
+                <div class="description">Executa com nome personalizado</div>
+                
+                <div class="command">docker run -it ubuntu:20.04 /bin/bash</div>
+                <div class="description">Executa interativamente com terminal</div>
+                
+                <div class="command">docker run --rm alpine echo "Hello World"</div>
+                <div class="description">Remove automaticamente após execução</div>
+            </div>
+
+            <h3>Gerenciar Containers</h3>
+            <div class="command-group">
+                <div class="command">docker ps</div>
+                <div class="description">Lista containers em execução</div>
+                
+                <div class="command">docker ps -a</div>
+                <div class="description">Lista todos os containers</div>
+                
+                <div class="command">docker stop container_id</div>
+                <div class="description">Para um container</div>
+                
+                <div class="command">docker start container_id</div>
+                <div class="description">Inicia um container parado</div>
+                
+                <div class="command">docker restart container_id</div>
+                <div class="description">Reinicia um container</div>
+                
+                <div class="command">docker kill container_id</div>
+                <div class="description">Força a parada de um container</div>
+                
+                <div class="command">docker rm container_id</div>
+                <div class="description">Remove um container parado</div>
+                
+                <div class="command">docker rm -f container_id</div>
+                <div class="description">Remove forçadamente (mesmo em execução)</div>
+            </div>
+
+            <h3>Interagir com Containers</h3>
+            <div class="command-group">
+                <div class="command">docker exec -it container_id /bin/bash</div>
+                <div class="description">Acessa terminal do container em execução</div>
+                
+                <div class="command">docker logs container_id</div>
+                <div class="description">Visualiza logs do container</div>
+                
+                <div class="command">docker logs -f container_id</div>
+                <div class="description">Segue logs em tempo real</div>
+                
+                <div class="command">docker inspect container_id</div>
+                <div class="description">Mostra informações detalhadas</div>
+                
+                <div class="command">docker stats</div>
+                <div class="description">Mostra estatísticas de uso de recursos</div>
+                
+                <div class="command">docker top container_id</div>
+                <div class="description">Lista processos em execução no container</div>
+            </div>
+
+            <h3>Copiar Arquivos</h3>
+            <div class="command-group">
+                <div class="command">docker cp arquivo.txt container_id:/tmp/</div>
+                <div class="description">Copia arquivo do host para container</div>
+                
+                <div class="command">docker cp container_id:/tmp/arquivo.txt ./</div>
+                <div class="description">Copia arquivo do container para host</div>
+            </div>
+
+            <div class="warning">
+                <strong>⚠️ Atenção:</strong> Containers são efêmeros por natureza. Dados importantes devem ser armazenados em volumes persistentes.
+            </div>
+        </div>
+
+        <div class="section" id="volumes">
+            <h2>💾 Gerenciamento de Volumes</h2>
+            
+            <h3>Comandos de Volume</h3>
+            <div class="command-group">
+                <div class="command">docker volume create meu-volume</div>
+                <div class="description">Cria um volume nomeado</div>
+                
+                <div class="command">docker volume ls</div>
+                <div class="description">Lista todos os volumes</div>
+                
+                <div class="command">docker volume inspect meu-volume</div>
+                <div class="description">Mostra detalhes do volume</div>
+                
+                <div class="command">docker volume rm meu-volume</div>
+                <div class="description">Remove um volume</div>
+                
+                <div class="command">docker volume prune</div>
+                <div class="description">Remove volumes não utilizados</div>
+            </div>
+
+            <h3>Usar Volumes com Containers</h3>
+            <div class="command-group">
+                <div class="command">docker run -d -v meu-volume:/data nginx</div>
+                <div class="description">Monta volume nomeado</div>
+                
+                <div class="command">docker run -d -v /host/path:/container/path nginx</div>
+                <div class="description">Bind mount (mapeia diretório do host)</div>
+                
+                <div class="command">docker run -d -v $(pwd):/app node:16</div>
+                <div class="description">Monta diretório atual</div>
+                
+                <div class="command">docker run -d --mount source=meu-volume,target=/data nginx</div>
+                <div class="description">Sintaxe alternativa com --mount</div>
+            </div>
+
+            <div class="tip">
+                <strong>💡 Dica:</strong> Volumes nomeados são mais portáveis que bind mounts e são a forma recomendada para persistir dados.
+            </div>
+        </div>
+
+        <div class="section" id="redes">
+            <h2>🌐 Gerenciamento de Redes</h2>
+            
+            <h3>Comandos de Rede</h3>
+            <div class="command-group">
+                <div class="command">docker network ls</div>
+                <div class="description">Lista todas as redes</div>
+                
+                <div class="command">docker network create minha-rede</div>
+                <div class="description">Cria uma rede personalizada</div>
+                
+                <div class="command">docker network create --driver bridge minha-rede</div>
+                <div class="description">Cria rede com driver específico</div>
+                
+                <div class="command">docker network inspect minha-rede</div>
+                <div class="description">Mostra detalhes da rede</div>
+                
+                <div class="command">docker network rm minha-rede</div>
+                <div class="description">Remove uma rede</div>
+                
+                <div class="command">docker network prune</div>
+                <div class="description">Remove redes não utilizadas</div>
+            </div>
+
+            <h3>Conectar Containers à Rede</h3>
+            <div class="command-group">
+                <div class="command">docker run -d --network minha-rede nginx</div>
+                <div class="description">Executa container em rede específica</div>
+                
+                <div class="command">docker network connect minha-rede container_id</div>
+                <div class="description">Conecta container existente à rede</div>
+                
+                <div class="command">docker network disconnect minha-rede container_id</div>
+                <div class="description">Desconecta container da rede</div>
+            </div>
+
+            <div class="example">
+                <h4>📝 Exemplo prático - Conectando aplicação ao banco:</h4>
+                <div class="command">docker network create app-network</div>
+                <div class="command">docker run -d --name db --network app-network postgres:13</div>
+                <div class="command">docker run -d --name web --network app-network -p 3000:3000 minha-app</div>
+                <div class="description">A aplicação web pode acessar o banco usando o nome "db"</div>
+            </div>
+        </div>
+
+        <div class="section" id="compose">
+            <h2>🎼 Docker Compose</h2>
+            
+            <h3>Comandos do Compose</h3>
+            <div class="command-group">
+                <div class="command">docker-compose up</div>
+                <div class="description">Inicia todos os serviços em foreground</div>
+                
+                <div class="command">docker-compose up -d</div>
+                <div class="description">Inicia todos os serviços em background</div>
+                
+                <div class="command">docker-compose up --build</div>
+                <div class="description">Reconstrói imagens antes de iniciar</div>
+                
+                <div class="command">docker-compose down</div>
+                <div class="description">Para e remove containers, redes</div>
+                
+                <div class="command">docker-compose down -v</div>
+                <div class="description">Para e remove containers, redes e volumes</div>
+                
+                <div class="command">docker-compose ps</div>
+                <div class="description">Lista containers do projeto</div>
+                
+                <div class="command">docker-compose logs</div>
+                <div class="description">Mostra logs de todos os serviços</div>
+                
+                <div class="command">docker-compose logs -f web</div>
+                <div class="description">Segue logs de um serviço específico</div>
+            </div>
+
+            <h3>Gerenciar Serviços</h3>
+            <div class="command-group">
+                <div class="command">docker-compose start</div>
+                <div class="description">Inicia serviços parados</div>
+                
+                <div class="command">docker-compose stop</div>
+                <div class="description">Para serviços sem remover</div>
+                
+                <div class="command">docker-compose restart web</div>
+                <div class="description">Reinicia um serviço específico</div>
+                
+                <div class="command">docker-compose scale web=3</div>
+                <div class="description">Escala serviço para 3 instâncias</div>
+                
+                <div class="command">docker-compose exec web bash</div>
+                <div class="description">Executa comando em container de serviço</div>
+            </div>
+
+            <div class="example">
+                <h4>📝 Exemplo de docker-compose.yml:</h4>
+                <pre style="background:#2c3e50; color:#ecf0f1; padding:15px; border-radius:5px; overflow-x:auto;">
+version: '3.8'
+services:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgres://user:password@db:5432/myapp
+    volumes:
+      - .:/app
+  
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=myapp
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:</pre>
+            </div>
+        </div>
+
+        <div class="section" id="avancados">
+            <h2>🚀 Comandos Avançados</h2>
+            
+            <h3>Registry e Repositórios</h3>
+            <div class="command-group">
+                <div class="command">docker login</div>
+                <div class="description">Faz login no Docker Hub</div>
+                
+                <div class="command">docker push usuario/minha-app:latest</div>
+                <div class="description">Envia imagem para repositório</div>
+                
+                <div class="command">docker pull usuario/minha-app:latest</div>
+                <div class="description">Baixa imagem de repositório</div>
+                
+                <div class="command">docker logout</div>
+                <div class="description">Faz logout do registry</div>
+            </div>
+
+            <h3>Backup e Restore</h3>
+            <div class="command-group">
+                <div class="command">docker save -o backup.tar minha-app</div>
+                <div class="description">Salva imagem em arquivo tar</div>
+                
+                <div class="command">docker load -i backup.tar</div>
+                <div class="description">Carrega imagem de arquivo tar</div>
+                
+                <div class="command">docker export container_id > backup.tar</div>
+                <div class="description">Exporta container como tar</div>
+                
+                <div class="command">docker import backup.tar nova-imagem</div>
+                <div class="description">Importa tar como nova imagem</div>
+            </div>
+
+            <h3>Monitoramento e Debug</h3>
+            <div class="command-group">
+                <div class="command">docker events</div>
+                <div class="description">Monitora eventos do Docker em tempo real</div>
+                
+                <div class="command">docker diff container_id</div>
+                <div class="description">Mostra mudanças no filesystem do container</div>
+                
+                <div class="command">docker port container_id</div>
+                <div class="description">Lista mapeamentos de porta</div>
+                
+                <div class="command">docker update --memory 512m container_id</div>
+                <div class="description">Atualiza configurações do container</div>
+            </div>
+
+            <h3>Limpeza e Manutenção</h3>
+            <div class="command-group">
+                <div class="command">docker container prune</div>
+                <div class="description">Remove containers parados</div>
+                
+                <div class="command">docker image prune</div>
+                <div class="description">Remove imagens não utilizadas</div>
+                
+                <div class="command">docker network prune</div>
+                <div class="description">Remove redes não utilizadas</div>
+                
+                <div class="command">docker volume prune</div>
+                <div class="description">Remove volumes não utilizados</div>
+                
+                <div class="command">docker system prune --all --volumes</div>
+                <div class="description">Limpeza completa do sistema</div>
+            </div>
+
+            <div class="warning">
+                <strong>⚠️ Cuidado:</strong> Comandos de limpeza podem remover dados importantes. Sempre verifique o que será removido antes de confirmar.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📖 Resumo de Comandos Mais Usados</h2>
+            <div class="command-group">
+                <div class="command">docker pull image_name</div>
+                <div class="command">docker run -d -p host_port:container_port image_name</div>
+                <div class="command">docker ps -a</div>
+                <div class="command">docker logs container_id</div>
+                <div class="command">docker exec -it container_id /bin/bash</div>
+                <div class="command">docker stop container_id</div>
+                <div class="command">docker rm container_id</div>
+                <div class="command">docker rmi image_name</div>
+                <div class="command">docker build -t tag_name .</div>
+                <div class="command">docker-compose up -d</div>
+                <div class="command">docker-compose down</div>
+                <div class="command">docker system prune</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🎯 Próximos Passos</h2>
+            <p>Agora que você conhece os comandos essenciais do Docker, aqui estão algumas sugestões para aprofundar seus conhecimentos:</p>
+            <ul>
+                <li><strong>Dockerfile:</strong> Aprenda a criar imagens personalizadas</li>
+                <li><strong>Multi-stage builds:</strong> Otimize suas imagens</li>
+                <li><strong>Docker Swarm:</strong> Orquestração de containers</li>
+                <li><strong>Kubernetes:</strong> Orquestração avançada</li>
+                <li><strong>Segurança:</strong> Boas práticas de segurança em containers</li>
+                <li><strong>CI/CD:</strong> Integração com pipelines de deployment</li>
+            </ul>
+        </div>
+
+        <div class="header" style="margin-top: 40px;">
+            <h2>🎉 Parabéns!</h2>
+            <p>Você agora tem uma base sólida para trabalhar com Docker. Continue praticando e explorando este ecossistema incrível!</p>
+        </div>
+    </div>
+
+    <script>
+        // Adiciona funcionalidade de scroll suave para links internos
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Adiciona efeito de destaque ao copiar comandos
+        document.querySelectorAll('.command').forEach(cmd => {
+            cmd.addEventListener('click', function() {
+                // Remove o símbolo $ do início para copiar apenas o comando
+                const text = this.textContent.replace(/^\$\s*/, '');
+                navigator.clipboard.writeText(text).then(() => {
+                    this.style.background = '#27ae60';
+                    setTimeout(() => {
+                        this.style.background = '#2c3e50';
+                    }, 500);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
